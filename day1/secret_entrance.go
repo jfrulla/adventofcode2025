@@ -53,13 +53,13 @@ func main() {
 			log.Fatal("Could not interpret input correctly")
 		}
 
-		// get the dial into the positive via increments of 100
-		for dial < 0 {
-			dial += 100
-		}
-
 		// modulus to get below 100
 		dial %= 100
+
+		// get the dial into the positive via increments of 100
+		if dial < 0 {
+			dial += 100
+		}
 
 		// determine if we've hit zero and increment if we have
 		if dial == 0 {
