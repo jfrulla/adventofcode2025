@@ -1,7 +1,8 @@
 package main
 
 // checking each number individually is O(n)
-// I wonder if there's a formula...
+// but I'll be evaluating thousands or maybe millions of numbers
+// I wonder if there's a trick in the parsing itself
 
 func main() {
 	// get the numbers in the ranges
