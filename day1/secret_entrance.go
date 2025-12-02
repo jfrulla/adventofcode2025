@@ -35,38 +35,39 @@ func main() {
 			continue // skip empty lines
 		}
 
-		fmt.Printf("Interpreting %s\n", line)
-
 		// break up the line into a direction and a number of clicks
 		direction := string(line[0])
 		number, err := strconv.Atoi(line[1:])
+
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// rotate the dial left or right
+		// Increment for each full rotation
+		rotations := number / 100
+		remainder := number % 100
+		password += rotations
+
+		// rotate the dial left or right and see if hit zero at any point
 		if direction == "L" {
+			if remainder >= dial && dial != 0 {
+				password++
+			}
 			dial -= number
 		} else if direction == "R" {
+			if remainder >= (100-dial) && dial != 0 {
+				password++
+			}
 			dial += number
 		} else {
 			log.Fatal("Could not interpret input correctly")
 		}
 
-		// modulus to get below 100
+		// correct the dial result
 		dial %= 100
-
-		// get the dial into the positive via increments of 100
 		if dial < 0 {
 			dial += 100
 		}
-
-		// determine if we've hit zero and increment if we have
-		if dial == 0 {
-			password++
-		}
-
-		fmt.Printf("The dial is now at %d\n", dial)
 	}
 
 	fmt.Printf("The password is %d\n", password)

@@ -1,24 +1,69 @@
 package main
 
-// checking each number individually is O(n)
-// but I'll be evaluating thousands or maybe millions of numbers
-// I wonder if there's a trick in the parsing itself
+import (
+	"fmt"
+	"log"
+	"math"
+	"os"
+	"strconv"
+	"strings"
+)
 
+// checkForValidIDs returns false if the ID is invalid (if they are a sequence of digits repeated twice)
+// and otherwise returns true
+func checkForValidID(id int) bool {
+	digits := len(strconv.Itoa(id))
+
+	// if there's an odd number of digits, it's flat-out valid
+	if digits%2 == 1 {
+		return true
+	}
+
+	// If the int is split in half and the first half equals the second half, it is invalid
+	firstHalf := id / int(math.Pow(10, float64(digits/2)))
+	secondHalf := id % int(math.Pow(10, float64(digits/2)))
+	if firstHalf-secondHalf == 0 {
+		return false
+	}
+	return true
+}
+
+// sumBadIDs takes one line of input as a string
+// we expect the input to be a list of integer ranges
+// e.g. "1234-4567,890-1023,987876-1234123445"
+func sumBadIDs(allIdRanges string) int {
+	sumOfBadIDs := 0
+	idRanges := strings.Split(allIdRanges, ",")
+	for _, idRange := range idRanges {
+		parts := strings.Split(idRange, "-")
+		firstNum, _ := strconv.Atoi(parts[0])
+		lastNum, _ := strconv.Atoi(parts[1])
+		for i := firstNum; i <= lastNum; i++ {
+			if !checkForValidID(i) {
+				sumOfBadIDs += i
+			}
+		}
+	}
+	return sumOfBadIDs
+}
+
+// MAIN
 func main() {
-	// get the numbers in the ranges
-	// split on the comma to get several sets of ranges
-	// for each range, split on the hyphen to get first and last
-	// i=first
-	// for i <= last
-	//		make the number a string
-	//		check the number
-	//		if mirrored, add to sum
-	//		i++
+	password := 0
 
-	// numbers with an odd number of digits are simply valid
-	// numbers with an even number of digits might be invalid
-	// convert all remaining numbers to strings
-	// break it evenly into 2 substrings
-	// see if substring1 == substring2
-	// add up all the invalid IDs
+	// Slurp up the input file
+	inputFileContents, err := os.ReadFile("input")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// For each line in the input file
+	lines := strings.Split(string(inputFileContents), "\n")
+	for _, line := range lines {
+		if line == "" {
+			continue // skip empty lines
+		}
+		password += sumBadIDs(line)
+	}
+	fmt.Printf("The password is %d\n", password)
 }
