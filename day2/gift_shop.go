@@ -3,27 +3,31 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"strings"
 )
 
-// checkForValidIDs returns false if the ID is invalid (if they are a sequence of digits repeated twice)
+// checkForValidIDs returns false if the ID is invalid (if they are a sequence of repeated numbers)
 // and otherwise returns true
 func checkForValidID(id int) bool {
-	digits := len(strconv.Itoa(id))
-
-	// if there's an odd number of digits, it's flat-out valid
-	if digits%2 == 1 {
-		return true
-	}
-
-	// If the int is split in half and the first half equals the second half, it is invalid
-	firstHalf := id / int(math.Pow(10, float64(digits/2)))
-	secondHalf := id % int(math.Pow(10, float64(digits/2)))
-	if firstHalf-secondHalf == 0 {
-		return false
+	idString := strconv.Itoa(id)
+	digits := len(idString)
+	for i := 1; i <= (digits / 2); i++ {
+		if digits%i != 0 {
+			continue // not an equal pattern, couldn't possibly be invalid
+		}
+		j := digits / i // might be a pattern of numbers repeating j times
+		for k := 1; k < j; k++ {
+			groupA := idString[(k-1)*i : k*i]
+			groupB := idString[k*i : (k+1)*i]
+			if groupA != groupB {
+				break
+			}
+			if k == j-1 {
+				return false
+			}
+		}
 	}
 	return true
 }
