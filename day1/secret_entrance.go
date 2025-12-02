@@ -23,7 +23,6 @@ func main() {
 	// Open the input file
 	fullInputPath := filepath.Join(cwd, "input")
 	fileHandle, err := os.Open(fullInputPath)
-	//inputData, err := os.ReadFile(fullInputPath)
 	if err != nil {
 		log.Fatal(err)
 	}
