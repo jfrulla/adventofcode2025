@@ -8,4 +8,4 @@ To compile and run, simply install some 2025-era version of golang, cd to one of
 go build name_of_program.go
 ```
 
-Then execute the binary while inside of that directory (I use relative paths for the input files in some cases).
+Then execute the binary while inside of that directory (I use relative paths for the input files in most/all cases).
