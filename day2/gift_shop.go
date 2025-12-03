@@ -15,23 +15,27 @@ func isValidID(id int) bool {
 	totalDigits := len(idString)
 
 	// check every possible grouping of digits
-	// starting at many groups of 1 digit, going to a max of 2 groups of half the digits each
+	// starting at many groups of 1 digit, up to 2 groups each with half the total digits
 	for sequenceDigits := 1; sequenceDigits <= (totalDigits / 2); sequenceDigits++ {
+
+		// if not an even pattern, try again with a new number of digits in sequence
 		if totalDigits%sequenceDigits != 0 {
-			continue // not an equal pattern, try a different grouping
+			continue
 		}
 
 		numGroups := totalDigits / sequenceDigits
 
 		// iterate through pairs of digit groups
-		// if any pair doesn't match, try again with a new sequenceDigits
-		// if all pairs match, we've found a winner!
 		for group := 1; group < numGroups; group++ {
 			groupA := idString[(group-1)*sequenceDigits : group*sequenceDigits]
 			groupB := idString[group*sequenceDigits : (group+1)*sequenceDigits]
+
+			// if any pair doesn't match, try again with a new number of digits in sequence
 			if groupA != groupB {
 				break
 			}
+
+			// if all pairs match, we've found a winner!
 			if group == numGroups-1 {
 				return false
 			}
