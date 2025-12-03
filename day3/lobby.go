@@ -43,24 +43,23 @@ func getBatteryBankJoltage(bank string, batteriesOn int) int {
 	for index, batRune := range bank {
 		digit, _ := strconv.Atoi(string(batRune))
 
-		// Check the bank battery against our slice of activated batteries
-		// If we find a battery that needs to go in our slice of batteries,
-		// then set it and clear out the values of every battery after it in the
+		// If we find a battery in the bank that needs to go in our slice of active batteries,
+		// then set it and clear out the values of every battery after it in our
 		// slice of activated batteries.
 		clearRemaining := false
-		for batNum, bat := range activatedBatteries {
+		for i, b := range activatedBatteries {
 			if clearRemaining {
-				activatedBatteries[batNum].index = 0
-				activatedBatteries[batNum].value = 0
+				activatedBatteries[i].index = 0
+				activatedBatteries[i].value = 0
 				continue
 			}
 
 			// e.g. the third-to-last battery in the bank CANNOT be
 			// anything before our third-to-last activated battery
-			finalIndex := numBankBatteries - batteriesOn + batNum + 1
-			if index >= bat.index && index < finalIndex && digit > bat.value {
-				activatedBatteries[batNum].index = index
-				activatedBatteries[batNum].value = digit
+			finalIndex := numBankBatteries - batteriesOn + i
+			if index >= b.index && index <= finalIndex && digit > b.value {
+				activatedBatteries[i].index = index
+				activatedBatteries[i].value = digit
 				clearRemaining = true
 			}
 		}
