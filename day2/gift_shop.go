@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// checkForValidIDs returns false if the ID is invalid (if they are a sequence of repeated numbers)
+// isValidID returns false if the ID is invalid (if they are a sequence of repeated numbers)
 // and otherwise returns true
 func isValidID(id int) bool {
 	idString := strconv.Itoa(id)
