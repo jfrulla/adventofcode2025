@@ -24,7 +24,7 @@ func main() {
 		if line == "" {
 			continue // skip empty lines
 		}
-		joltage += getBatteryBankJoltage(line)
+		joltage += getBatteryBankJoltage(line, 12)
 	}
 	fmt.Printf("The joltage is %d\n", joltage)
 }
@@ -32,43 +32,45 @@ func main() {
 // getBatteryBankJoltage takes a string representing a battery bank
 // expected format is just a series of integers: "867442382356..."
 // It finds the greatest possible Joltage and returns that as a result
-func getBatteryBankJoltage(bank string) int {
+func getBatteryBankJoltage(bank string, batteriesOn int) int {
 	type battery struct {
 		index int
 		value int
 	}
+	activatedBatteries := make([]battery, batteriesOn)
+	numBankBatteries := len(bank)
 
-	// I need to keep track of value AND position
-	var highestFirstDigit = battery{index: 0, value: 0}
-	var highestSecondDigit = battery{index: 1, value: 0}
+	for index, batRune := range bank {
+		digit, _ := strconv.Atoi(string(batRune))
 
-	bankBatteries := len(bank)
-
-	for index, rune := range bank {
-		digit, _ := strconv.Atoi(string(rune))
-
-		// If we find a battery that is higher than the first digit,
-		// it doesn't matter what the second digit was before.
-		if index >= highestFirstDigit.index && index < bankBatteries-1 {
-			if digit > highestFirstDigit.value {
-				highestFirstDigit.index = index
-				highestFirstDigit.value = digit
-				highestSecondDigit.index = index + 1
-				highestSecondDigit.value = 0
+		// Check the bank battery against our slice of activated batteries
+		// If we find a battery that needs to go in our slice of batteries,
+		// then set it and clear out the values of every battery after it in the
+		// slice of activated batteries.
+		clearRemaining := false
+		for batNum, bat := range activatedBatteries {
+			if clearRemaining {
+				activatedBatteries[batNum].index = 0
+				activatedBatteries[batNum].value = 0
 				continue
-				// if we found a new first battery,
-				// there's no reason to look at the second battery
 			}
-		}
-		if index >= highestSecondDigit.index {
-			if digit > highestSecondDigit.value {
-				highestSecondDigit.index = index
-				highestSecondDigit.value = digit
+
+			// e.g. the third-to-last battery in the bank CANNOT be
+			// anything before our third-to-last activated battery
+			finalIndex := numBankBatteries - batteriesOn + batNum + 1
+			if index >= bat.index && index < finalIndex && digit > bat.value {
+				activatedBatteries[batNum].index = index
+				activatedBatteries[batNum].value = digit
+				clearRemaining = true
 			}
 		}
 	}
 
-	// conversion BS to concatenate the two digits together
-	joltage, _ := strconv.Atoi(fmt.Sprintf("%d%d", highestFirstDigit.value, highestSecondDigit.value))
+	// concatenate all digits together
+	joltageStr := ""
+	for _, bat := range activatedBatteries {
+		joltageStr = fmt.Sprintf("%s%d", joltageStr, bat.value)
+	}
+	joltage, _ := strconv.Atoi(joltageStr)
 	return joltage
 }
