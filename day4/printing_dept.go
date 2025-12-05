@@ -7,11 +7,16 @@ import (
 	"strings"
 )
 
+type PaperGrid struct {
+	matrix [][]rune
+	m_max  int
+	n_max  int
+}
+
 // MAIN
 func main() {
-
 	// get our datastructures ready
-	grid := [][]rune{}
+	grid := PaperGrid{} //[][]rune{}
 
 	// Slurp up the input file
 	inputFileContents, err := os.ReadFile("input")
@@ -25,19 +30,19 @@ func main() {
 		if line == "" {
 			continue // skip empty lines
 		}
-		grid = append(grid, []rune(line))
+		grid.matrix = append(grid.matrix, []rune(line))
 	}
 
 	// this assumes a rectangular grid
-	max_m := len(grid[0]) - 1
-	max_n := len(grid) - 1
+	grid.m_max = len(grid.matrix[0]) - 1
+	grid.n_max = len(grid.matrix) - 1
 
 	totalAccessible := 0
-	accessibleRolls := getRolls(&grid, max_m, max_n, 1)
+	accessibleRolls := getRolls(&grid, 1)
 	fmt.Printf("The part1 answer is %d\n", accessibleRolls)
 
 	for accessibleRolls > 0 {
-		accessibleRolls = getRolls(&grid, max_m, max_n, 2)
+		accessibleRolls = getRolls(&grid, 2)
 		totalAccessible += accessibleRolls
 	}
 	fmt.Printf("The part2 answer is %d\n", totalAccessible)
@@ -46,15 +51,15 @@ func main() {
 // getRolls takes a pointer to a slice of strings and the max number
 // of adjacent rolls as input and returns the total number of
 // accessible rolls as an int
-func getRolls(grid *[][]rune, max_m int, max_n int, part int) int {
+func getRolls(grid *PaperGrid, part int) int {
 	count := 0
 
-	for n := 0; n <= max_n; n++ {
-		for m := 0; m <= max_m; m++ {
+	for n := 0; n <= (*grid).n_max; n++ {
+		for m := 0; m <= (*grid).m_max; m++ {
 
 			// if the one we're looking at isn't a paper roll
 			// then we don't care about it.
-			if (*grid)[n][m] != '@' {
+			if (*grid).matrix[n][m] != '@' {
 				continue
 			}
 
@@ -64,56 +69,56 @@ func getRolls(grid *[][]rune, max_m int, max_n int, part int) int {
 			if n > 0 {
 				//left
 				if m > 0 {
-					if (*grid)[n-1][m-1] == '@' {
+					if (*grid).matrix[n-1][m-1] == '@' {
 						adjacent++
 					}
 				}
 				//middle
-				if (*grid)[n-1][m] == '@' {
+				if (*grid).matrix[n-1][m] == '@' {
 					adjacent++
 				}
 				//right
-				if m < max_m {
-					if (*grid)[n-1][m+1] == '@' {
+				if m < (*grid).m_max {
+					if (*grid).matrix[n-1][m+1] == '@' {
 						adjacent++
 					}
 				}
 			}
 			// left
 			if m > 0 {
-				if (*grid)[n][m-1] == '@' {
+				if (*grid).matrix[n][m-1] == '@' {
 					adjacent++
 				}
 			}
 			//right
-			if m < max_m {
-				if (*grid)[n][m+1] == '@' {
+			if m < (*grid).m_max {
+				if (*grid).matrix[n][m+1] == '@' {
 					adjacent++
 				}
 			}
 			//bottom
-			if n < max_n {
+			if n < (*grid).n_max {
 				//left
 				if m > 0 {
-					if (*grid)[n+1][m-1] == '@' {
+					if (*grid).matrix[n+1][m-1] == '@' {
 						adjacent++
 					}
 				}
 				//middle
-				if (*grid)[n+1][m] == '@' {
+				if (*grid).matrix[n+1][m] == '@' {
 					adjacent++
 				}
 
 				//right
-				if m < max_m {
-					if (*grid)[n+1][m+1] == '@' {
+				if m < (*grid).m_max {
+					if (*grid).matrix[n+1][m+1] == '@' {
 						adjacent++
 					}
 				}
 			}
 			if adjacent < 4 {
 				if part == 2 {
-					(*grid)[n][m] = '.'
+					(*grid).matrix[n][m] = '.'
 				}
 				count++
 			}
@@ -121,3 +126,6 @@ func getRolls(grid *[][]rune, max_m int, max_n int, part int) int {
 	}
 	return count
 }
+
+// func evaluate cell
+//func evalCell()
