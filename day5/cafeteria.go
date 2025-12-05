@@ -22,7 +22,11 @@ func main() {
 	}
 
 	// process & parse the input file
-	ingredientIds, idRanges, _ := processInput(inputFileContents)
+	ingredientIds, idRanges, err := processInput(inputFileContents)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
 
 	// count the number of fresh ingredients we have for part1
 	totalFresh := 0
