@@ -10,7 +10,8 @@ import (
 
 // MAIN
 func main() {
-	joltage := 0
+	joltageP1 := 0
+	joltageP2 := 0
 
 	// Slurp up the input file
 	inputFileContents, err := os.ReadFile("input")
@@ -24,9 +25,11 @@ func main() {
 		if line == "" {
 			continue // skip empty lines
 		}
-		joltage += getBatteryBankJoltage(line, 12)
+		joltageP1 += getBatteryBankJoltage(line, 2)
+		joltageP2 += getBatteryBankJoltage(line, 12)
 	}
-	fmt.Printf("The joltage is %d\n", joltage)
+	fmt.Printf("The part 1 joltage is %d\n", joltageP1)
+	fmt.Printf("The part 2 joltage is %d\n", joltageP2)
 }
 
 // getBatteryBankJoltage takes a string representing a battery bank
