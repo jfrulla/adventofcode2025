@@ -67,17 +67,17 @@ func getRollsPart1(grid *PaperGrid) {
 			}
 
 			// count the rolls in the adjacent cells
-			adjacent := 0
+			(*grid).adjacent[n][m] = 0
 			for _, vector := range directions {
 				nn, nm := n+vector[0], m+vector[1]
 				if nn >= 0 && nn <= (*grid).n_max && nm >= 0 && nm <= (*grid).m_max {
 					if (*grid).matrix[nn][nm] == '@' {
-						adjacent++
+						(*grid).adjacent[n][m]++
 					}
 				}
 			}
 
-			if adjacent < 4 {
+			if (*grid).adjacent[n][m] < 4 {
 				(*grid).count++
 			}
 		}
@@ -94,7 +94,7 @@ func getRollsPart2(grid *PaperGrid) {
 	// Call a recursive evaluation a minimum of one time per roll
 	for n := 0; n <= (*grid).n_max; n++ {
 		for m := 0; m <= (*grid).m_max; m++ {
-			if (*grid).matrix[n][m] == '@' {
+			if (*grid).adjacent[n][m] < 4 && (*grid).matrix[n][m] == '@' {
 				evalCell(grid, n, m)
 			}
 		}
