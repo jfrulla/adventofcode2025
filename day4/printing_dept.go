@@ -12,6 +12,7 @@ type PaperGrid struct {
 	adjacent [][]int  // keep track of roll adjacency
 	m_max    int      // lets not run len() more than once
 	n_max    int      // lets not run len() more than once
+	count    int      // keep count of removed rolls
 }
 
 var directions [][]int // A global defining adjacency vectors
@@ -42,19 +43,19 @@ func main() {
 	grid.m_max = len(grid.matrix[0]) - 1
 	grid.n_max = len(grid.matrix) - 1
 
-	accessibleRolls := getRollsPart1(&grid)
-	fmt.Printf("The part1 answer is %d\n", accessibleRolls)
+	getRollsPart1(&grid)
+	fmt.Printf("The part1 answer is %d\n", grid.count)
 
-	totalAccessible := getRollsPart2(&grid)
-	fmt.Printf("The part2 answer is %d\n", totalAccessible)
+	getRollsPart2(&grid)
+	fmt.Printf("The part2 answer is %d\n", grid.count)
 }
 
 // getRollsPart1 takes a pointer to a struct containing
 // relevant information about the grid, calculates
 // how many rolls can be removed with a simple iteration
 // and returns the count
-func getRollsPart1(grid *PaperGrid) int {
-	count := 0
+func getRollsPart1(grid *PaperGrid) {
+	(*grid).count = 0
 
 	for n := 0; n <= (*grid).n_max; n++ {
 		for m := 0; m <= (*grid).m_max; m++ {
@@ -77,19 +78,18 @@ func getRollsPart1(grid *PaperGrid) int {
 			}
 
 			if adjacent < 4 {
-				count++
+				(*grid).count++
 			}
 		}
 	}
-	return count
 }
 
 // getRollsPart2 takes a pointer to a struct containing
 // relevant information about the grid, calculates
 // how many rolls can be removed via indefinite iterations,
 // and returns the count as an int
-func getRollsPart2(grid *PaperGrid) int {
-	count := 0
+func getRollsPart2(grid *PaperGrid) {
+	(*grid).count = 0
 
 	// Call a recursive evaluation a minimum of one time per roll
 	for n := 0; n <= (*grid).n_max; n++ {
@@ -99,17 +99,6 @@ func getRollsPart2(grid *PaperGrid) int {
 			}
 		}
 	}
-
-	// Loop through one time to count the x's
-	for n := 0; n <= (*grid).n_max; n++ {
-		for m := 0; m <= (*grid).m_max; m++ {
-			if (*grid).matrix[n][m] == 'x' {
-				count++
-			}
-		}
-	}
-
-	return count
 }
 
 // evalCell takes a pointer to the grid, alongside a position vector,
@@ -136,6 +125,7 @@ func evalCell(grid *PaperGrid, n int, m int) {
 	// and recursively check any nearby rolls that may qualify for removal
 	if (*grid).matrix[n][m] == '@' && (*grid).adjacent[n][m] < 4 {
 		(*grid).matrix[n][m] = 'x'
+		(*grid).count++
 		for _, vector := range directions {
 			nn, nm := n+vector[0], m+vector[1]
 			if nn >= 0 && nn <= (*grid).n_max && nm >= 0 && nm <= (*grid).m_max {
