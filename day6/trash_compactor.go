@@ -17,20 +17,18 @@ func main() {
 	}
 
 	// process & parse the input file
-	operands, operators, err := processInputForPart1(inputFileContents)
+	operands, operators, leftAlignment, err := processInput(inputFileContents)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
+
+	//part 1
 	total := cephMath(operands, operators)
 	fmt.Printf("The part1 answer is %d\n", total)
 
 	//part 2
-	operands, operators, err = processInputForPart1(inputFileContents)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
+	operands = transformElements(operands, leftAlignment)
 	total = cephMath(operands, operators)
 	fmt.Printf("The part2 answer is %d\n", total)
 
@@ -39,11 +37,12 @@ func main() {
 // procesInput takes the entire bytestring from the file and
 // returns a list of operations ([]rune)
 // and a list of operands per operation ([][]int)
-func processInputForPart1(fileInput []byte) ([][]int, []rune, error) {
+func processInput(fileInput []byte) ([][]int, []rune, []bool, error) {
 	// get our datastructures ready
 	operands := [][]int{}
 	intMatrix := [][]int{}
 	operators := []rune{}
+	leftAlignment := []bool{}
 
 	// For each line in the input file
 	lines := strings.Split(string(fileInput), "\n")
@@ -51,18 +50,37 @@ func processInputForPart1(fileInput []byte) ([][]int, []rune, error) {
 		if line == "" {
 			continue
 		}
-		intSlice := []int{}
 		parts := strings.Fields(line)
-		for _, field := range parts {
-			k, err := strconv.Atoi(field)
-			if err != nil {
-				// must be a * or +
-				operators = append(operators, []rune(field)[0])
-			} else {
+		_, err := strconv.Atoi(parts[0])
+		if err != nil {
+			// must be the line of operators
+			// loop through each individual character,
+			// get the operators, and also
+			// determine whether the column is left or right aligned
+			alignmentIndex := 0
+			for charIndex, char := range line {
+				if char != ' ' {
+					leftAlignment = append(leftAlignment, true)
+					operators = append(operators, char)
+					// for each line
+					for _, l := range lines {
+						if l == "" {
+							continue
+						}
+						if l[charIndex] == ' ' {
+							leftAlignment[alignmentIndex] = false
+						}
+					}
+					alignmentIndex++
+				}
+			}
+		} else {
+			// must be a number
+			intSlice := []int{}
+			for _, field := range parts {
+				k, _ := strconv.Atoi(field)
 				intSlice = append(intSlice, k)
 			}
-		}
-		if len(intSlice) > 0 {
 			intMatrix = append(intMatrix, intSlice)
 		}
 	}
@@ -77,51 +95,7 @@ func processInputForPart1(fileInput []byte) ([][]int, []rune, error) {
 		operands = append(operands, elementSlice)
 	}
 
-	return operands, operators, nil
-}
-
-// procesInput takes the entire bytestring from the file and
-// returns a list of operations ([]rune)
-// and a list of operands per operation ([][]int)
-func processInputForPart2(fileInput []byte) ([][]int, []rune, error) {
-	// get our datastructures ready
-	operands := [][]int{}
-	intMatrix := [][]int{}
-	operators := []rune{}
-
-	// For each line in the input file
-	lines := strings.Split(string(fileInput), "\n")
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-		intSlice := []int{}
-		parts := strings.Fields(line)
-		for _, field := range parts {
-			k, err := strconv.Atoi(field)
-			if err != nil {
-				// must be a * or +
-				operators = append(operators, []rune(field)[0])
-			} else {
-				intSlice = append(intSlice, k)
-			}
-		}
-		if len(intSlice) > 0 {
-			intMatrix = append(intMatrix, intSlice)
-		}
-	}
-
-	// now we need to transform the intMatrix to operationElements
-	// by reversing our rows and columns
-	for index, _ := range operators {
-		elementSlice := []int{}
-		for _, intSlice := range intMatrix {
-			elementSlice = append(elementSlice, intSlice[index])
-		}
-		operands = append(operands, elementSlice)
-	}
-
-	return operands, operators, nil
+	return operands, operators, leftAlignment, nil
 }
 
 func cephMath(operands [][]int, operators []rune) int {
@@ -149,23 +123,28 @@ func cephMath(operands [][]int, operators []rune) int {
 	return sumSolutions
 }
 
-func transformElements(operands [][]int) [][]int {
-	// iterate through the operands for each operation
-	// convert the operands to strings
-	// each number is going to be all operandString[i] concatenated together for each operand
+func transformElements(operands [][]int, leftAlignment []bool) [][]int {
 	newOperands := [][]int{}
-	for _, opList := range operands {
+	for index, opList := range operands {
 		newStrOps := []string{}
 		newOps := []int{}
 		for _, op := range opList {
 			opStr := strconv.Itoa(op)
 			width := len(opStr)
-			// for each char in the opStr
-			for i := width - 1; i >= 0; i-- {
-				if len(newStrOps) < width {
-					newStrOps = append(newStrOps, "")
+			if leftAlignment[index] {
+				for i := 0; i < width; i++ {
+					if len(newStrOps) < width {
+						newStrOps = append(newStrOps, "")
+					}
+					newStrOps[i] += string(opStr[i])
 				}
-				newStrOps[width-1-i] += string(opStr[i])
+			} else {
+				for i := width - 1; i >= 0; i-- {
+					if len(newStrOps) < width {
+						newStrOps = append(newStrOps, "")
+					}
+					newStrOps[width-1-i] += string(opStr[i])
+				}
 			}
 		}
 		for _, opStr := range newStrOps {
@@ -174,8 +153,5 @@ func transformElements(operands [][]int) [][]int {
 		}
 		newOperands = append(newOperands, newOps)
 	}
-
-	fmt.Printf("New Operands: %v\n", total)
-
 	return newOperands
 }
