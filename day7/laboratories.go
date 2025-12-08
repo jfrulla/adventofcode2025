@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -56,6 +55,7 @@ func main() {
 		}
 	}
 
+	// Total number of worlds is the sum of the last line in the worlds diagram
 	worlds := 0
 	for _, world := range worldDiagram[len(worldDiagram)-1] {
 		worlds += world
@@ -63,12 +63,6 @@ func main() {
 
 	for _, line := range manifoldDiagram {
 		fmt.Printf("%s\n", string(line))
-	}
-	for _, line := range worldDiagram {
-		for _, world := range line {
-			fmt.Printf("%s", strconv.Itoa(world))
-		}
-		fmt.Printf("\n")
 	}
 
 	//part 1
@@ -78,15 +72,3 @@ func main() {
 	fmt.Printf("The part2 answer is %d\n", worlds)
 
 }
-
-// at every position, each beam has a number of possible worlds associated with it
-//     S
-//     1
-//   1 ^ 1
-//   1   1
-// 1 ^ 2 ^ 1
-// 1   2   1
-//1^ 3 ^ 3 ^ 1, sum = 8
-
-// OH THATS A BINOMIAL COEFFICIENT SEQUENCE!!
-// but with a slight variation on splits vs non-splits
