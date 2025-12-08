@@ -31,7 +31,6 @@ func main() {
 	operands = transformElements(operands, leftAlignment)
 	total = cephMath(operands, operators)
 	fmt.Printf("The part2 answer is %d\n", total)
-
 }
 
 // procesInput takes the entire bytestring from the file and
@@ -67,6 +66,9 @@ func processInput(fileInput []byte) ([][]int, []rune, []bool, error) {
 						if l == "" {
 							continue
 						}
+						// the operator is ALWAYS left aligned, so any spaces
+						// in the same column mean the operands are right-aligned
+						// (or square)
 						if l[charIndex] == ' ' {
 							leftAlignment[alignmentIndex] = false
 						}
