@@ -43,7 +43,7 @@ func main() {
 		circuits = append(circuits, []int{index}) // one circuit per box to start
 	}
 
-	// build the graph
+	// build the graph edges
 	edges := getDistances(junctionBoxCoords)
 
 	// PART 1
