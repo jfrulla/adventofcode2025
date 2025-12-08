@@ -52,7 +52,7 @@ func main() {
 		makeConnection(edges[i].boxes, &circuits)
 	}
 
-	// sort slice of circuits by descending length
+	// sort slice of circuits by length
 	sort.Slice(circuits, func(i, j int) bool {
 		return len(circuits[i]) > len(circuits[j])
 	})
