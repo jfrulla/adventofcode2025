@@ -46,13 +46,10 @@ func main() {
 	// build the graph
 	edges := getDistances(junctionBoxCoords)
 
-	// Note: from this point forward, we mostly only
-	// reference boxes by their index in junctionBoxCoords
-
 	// PART 1
 	// make the 1000 closest connections
 	for i := 0; i < 1000; i++ {
-		connect(edges[i].boxes, &circuits)
+		makeConnection(edges[i].boxes, &circuits)
 	}
 
 	// sort slice of circuits by descending length
@@ -60,20 +57,19 @@ func main() {
 		return len(circuits[i]) > len(circuits[j])
 	})
 
-	// multiply the length of the 3 longest circuits
+	// multiply the length of the 3 longest circuits & display
 	answer := len(circuits[0]) * len(circuits[1]) * len(circuits[2])
 	fmt.Printf("The part1 answer is %d\n", answer)
 
 	// PART 2
-	lastConnectedPair := []int{}
-
 	// make connections until we only have 1 circuit
+	lastConnectedPair := []int{}
 	for i := 0; len(circuits) > 1; i++ {
-		connect(edges[i].boxes, &circuits)
+		makeConnection(edges[i].boxes, &circuits)
 		lastConnectedPair = edges[i].boxes
 	}
 
-	// multiply the x-values of the last 2 boxes that were connected together
+	// multiply the x-values of the last 2 boxes that were connected together & display
 	answer = junctionBoxCoords[lastConnectedPair[0]][0] * junctionBoxCoords[lastConnectedPair[1]][0]
 	fmt.Printf("The part2 answer is %d\n", answer)
 }
@@ -96,53 +92,30 @@ func getDistances(junctionBoxCoords [][]int) []Edge {
 	return edges
 }
 
-// connect takes a pair of box indices and a ptr to the slice of all circuits.
-// If the pair of boxes is in the same circuit, does nothing.
-// If they are two separate circuits, the circuits will be merged together.
-func connect(boxes []int, circuits *[][]int) {
-	if checkCircuitBoxes(boxes, circuits) {
-		return
-	} else {
-		mergeCircuits(boxes, circuits)
-	}
-
-}
-
-// checkCircuitBoxes returns true if the box indices are in the same circuit already.
-// returns false if they are in different circuits.
-func checkCircuitBoxes(boxes []int, circuits *[][]int) bool {
-	for _, circuit := range *circuits {
-		box1Found := false
-		box2Found := false
+// makeConnection will find the two circuits associated with the
+// given pair of boxes and will then collapse one circuit into another
+// if they are in two different circuits
+func makeConnection(boxes []int, circuits *[][]int) {
+	box1Circuit, box2Circuit := 0, 0
+	for circuitIndex, circuit := range *circuits {
+		box1Found, box2Found := false, false
 		for _, box := range circuit {
 			if box == boxes[0] {
 				box1Found = true
-			}
-			if box == boxes[1] {
-				box2Found = true
-			}
-		}
-		if box1Found && box2Found {
-			return true
-		}
-	}
-	return false
-}
-
-// mergeCircuits will find the two circuits associated with the
-// given pair of boxes and will then collapse one circuit into another
-func mergeCircuits(boxes []int, circuits *[][]int) {
-	box1Circuit, box2Circuit := 0, 0
-	for circuitIndex, circuit := range *circuits {
-		for _, box := range circuit {
-			if box == boxes[0] {
 				box1Circuit = circuitIndex
 			}
 			if box == boxes[1] {
+				box2Found = true
 				box2Circuit = circuitIndex
 			}
 		}
+		// if both boxes are in the same circuit, return without doing anything
+		if box1Found && box2Found {
+			return
+		}
 	}
+	// if we found both in different circuits
+	// join them into the first one, throw away the second one
 	(*circuits)[box1Circuit] = append((*circuits)[box1Circuit], (*circuits)[box2Circuit]...)
 	if box2Circuit < len(*circuits)-1 {
 		*circuits = append((*circuits)[:box2Circuit], (*circuits)[box2Circuit+1:]...)
