@@ -64,7 +64,7 @@ func main() {
 	// PART 2
 	// make connections until we only have 1 circuit
 	lastConnectedPair := []int{}
-	for i := 0; len(circuits) > 1; i++ {
+	for i := 1000; len(circuits) > 1; i++ {
 		makeConnection(edges[i].boxes, &circuits)
 		lastConnectedPair = edges[i].boxes
 	}
