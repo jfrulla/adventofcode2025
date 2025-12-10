@@ -81,29 +81,26 @@ func getInternalAreas(redTiles []Tile) []TileArea {
 		for tile2Index := tile1Index + 1; tile2Index < len(redTiles); tile2Index++ {
 			intersecting := false
 			for i, _ := range redTiles {
-				if i == tile1Index || i == tile2Index {
-					continue
-				}
-				if redTiles[tile1Index].X <= redTiles[tile2Index].X {
-					if redTiles[tile1Index].Y <= redTiles[tile2Index].Y {
-						if redTiles[tile1Index].X <= redTiles[i].X && redTiles[i].X <= redTiles[tile2Index].X && redTiles[tile1Index].Y <= redTiles[i].Y && redTiles[i].Y <= redTiles[tile2Index].Y {
+				if redTiles[tile1Index].X < redTiles[tile2Index].X {
+					if redTiles[tile1Index].Y < redTiles[tile2Index].Y {
+						if redTiles[tile1Index].X < redTiles[i].X && redTiles[i].X < redTiles[tile2Index].X && redTiles[tile1Index].Y < redTiles[i].Y && redTiles[i].Y < redTiles[tile2Index].Y {
 							intersecting = true
 							break
 						}
 					} else {
-						if redTiles[tile1Index].X <= redTiles[i].X && redTiles[i].X <= redTiles[tile2Index].X && redTiles[tile1Index].Y >= redTiles[i].Y && redTiles[i].Y >= redTiles[tile2Index].Y {
+						if redTiles[tile1Index].X < redTiles[i].X && redTiles[i].X < redTiles[tile2Index].X && redTiles[tile1Index].Y > redTiles[i].Y && redTiles[i].Y > redTiles[tile2Index].Y {
 							intersecting = true
 							break
 						}
 					}
 				} else {
-					if redTiles[tile1Index].Y <= redTiles[tile2Index].Y {
-						if redTiles[tile1Index].X >= redTiles[i].X && redTiles[i].X >= redTiles[tile2Index].X && redTiles[tile1Index].Y <= redTiles[i].Y && redTiles[i].Y <= redTiles[tile2Index].Y {
+					if redTiles[tile1Index].Y < redTiles[tile2Index].Y {
+						if redTiles[tile1Index].X >= redTiles[i].X && redTiles[i].X > redTiles[tile2Index].X && redTiles[tile1Index].Y < redTiles[i].Y && redTiles[i].Y < redTiles[tile2Index].Y {
 							intersecting = true
 							break
 						}
 					} else {
-						if redTiles[tile1Index].X >= redTiles[i].X && redTiles[i].X >= redTiles[tile2Index].X && redTiles[tile1Index].Y >= redTiles[i].Y && redTiles[i].Y >= redTiles[tile2Index].Y {
+						if redTiles[tile1Index].X > redTiles[i].X && redTiles[i].X > redTiles[tile2Index].X && redTiles[tile1Index].Y > redTiles[i].Y && redTiles[i].Y > redTiles[tile2Index].Y {
 							intersecting = true
 							break
 						}
